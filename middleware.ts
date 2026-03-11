@@ -7,7 +7,7 @@ const PUBLIC_PATHS = [
   "/api/screens/",
   "/api/uploads/",
   "/_next",
-  "/favicon.ico",
+  "/favicon.ico", 
 ];
 
 function isPublic(pathname: string): boolean {
