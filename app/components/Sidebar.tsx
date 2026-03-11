@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: "⊞" },
@@ -11,6 +12,14 @@ const NAV_ITEMS = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [screenCount, setScreenCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/screens")
+      .then((r) => r.json())
+      .then((data) => setScreenCount(data.length))
+      .catch(() => {});
+  }, [pathname]);
 
   return (
     <aside className="w-64 min-h-screen bg-sidebar-bg text-sidebar-fg flex flex-col shrink-0">
@@ -41,7 +50,9 @@ export default function Sidebar() {
         })}
       </nav>
       <div className="p-4 border-t border-white/10">
-        <p className="text-xs text-white/40">7 Screens Connected</p>
+        <p className="text-xs text-white/40">
+          {screenCount !== null ? `${screenCount} Screen${screenCount !== 1 ? "s" : ""}` : "Loading..."}
+        </p>
       </div>
     </aside>
   );

@@ -6,27 +6,23 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const scheduleId = parseInt(id, 10);
-  if (isNaN(scheduleId)) {
+  const screenId = parseInt(id, 10);
+  if (isNaN(screenId)) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
 
   try {
     const body = await req.json();
-    const schedule = await prisma.schedule.update({
-      where: { id: scheduleId },
+    const screen = await prisma.screen.update({
+      where: { id: screenId },
       data: {
-        ...(body.screenId && { screenId: parseInt(body.screenId, 10) }),
-        ...(body.mediaId && { mediaId: parseInt(body.mediaId, 10) }),
-        ...(body.startTime && { startTime: body.startTime }),
-        ...(body.endTime && { endTime: body.endTime }),
+        ...(body.name !== undefined && { name: body.name }),
+        ...(body.description !== undefined && { description: body.description }),
       },
-      include: { screen: true, media: true },
     });
-
-    return NextResponse.json(schedule);
+    return NextResponse.json(screen);
   } catch (error) {
-    console.error("Update schedule error:", error);
+    console.error("Update screen error:", error);
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }
@@ -36,16 +32,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const scheduleId = parseInt(id, 10);
-  if (isNaN(scheduleId)) {
+  const screenId = parseInt(id, 10);
+  if (isNaN(screenId)) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
 
   try {
-    await prisma.schedule.delete({ where: { id: scheduleId } });
+    await prisma.screen.delete({ where: { id: screenId } });
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Delete schedule error:", error);
+    console.error("Delete screen error:", error);
     return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
   }
 }

@@ -34,9 +34,6 @@ model Schedule {
   mediaId   Int
   startTime String
   endTime   String
-  days      String   @default("mon,tue,wed,thu,fri,sat,sun")
-  priority  Int      @default(0)
-  active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

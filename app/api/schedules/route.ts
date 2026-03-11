@@ -12,7 +12,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { screenId, mediaId, startTime, endTime, days, priority, active } = body;
+    const { screenId, mediaId, startTime, endTime } = body;
 
     if (!screenId || !mediaId || !startTime || !endTime) {
       return NextResponse.json(
@@ -27,9 +27,6 @@ export async function POST(req: NextRequest) {
         mediaId: parseInt(mediaId, 10),
         startTime,
         endTime,
-        days: days || "mon,tue,wed,thu,fri,sat,sun",
-        priority: priority ?? 0,
-        active: active ?? true,
       },
       include: { screen: true, media: true },
     });

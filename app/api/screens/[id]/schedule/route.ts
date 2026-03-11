@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { getBrusselsTime } from "@/lib/timezone";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -12,7 +11,10 @@ export async function GET(
     return NextResponse.json({ error: "Invalid screen ID" }, { status: 400 });
   }
 
-  const currentTime = getBrusselsTime();
+  const screen = await prisma.screen.findUnique({ where: { id: screenId } });
+  if (!screen) {
+    return NextResponse.json({ error: "Screen not found" }, { status: 404 });
+  }
 
   const schedules = await prisma.schedule.findMany({
     where: { screenId },
@@ -20,20 +22,18 @@ export async function GET(
     orderBy: { startTime: "asc" },
   });
 
-  const matching = schedules.find(
-    (s) => currentTime >= s.startTime && currentTime < s.endTime
-  );
-
-  if (!matching) {
-    return NextResponse.json({ media: null, schedule: null });
-  }
-
   return NextResponse.json({
-    media: matching.media,
-    schedule: {
-      id: matching.id,
-      startTime: matching.startTime,
-      endTime: matching.endTime,
-    },
+    screen: { id: screen.id, name: screen.name },
+    slots: schedules.map((s) => ({
+      id: s.id,
+      startTime: s.startTime,
+      endTime: s.endTime,
+      media: {
+        id: s.media.id,
+        filename: s.media.filename,
+        originalName: s.media.originalName,
+        mimeType: s.media.mimeType,
+      },
+    })),
   });
 }
