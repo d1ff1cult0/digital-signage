@@ -1,15 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { getBrusselsNow } from "@/lib/timezone";
 import { NextRequest, NextResponse } from "next/server";
-
-const DAY_MAP: Record<number, string> = {
-  0: "sun",
-  1: "mon",
-  2: "tue",
-  3: "wed",
-  4: "thu",
-  5: "fri",
-  6: "sat",
-};
 
 export async function GET(
   _req: NextRequest,
@@ -21,9 +12,7 @@ export async function GET(
     return NextResponse.json({ error: "Invalid screen ID" }, { status: 400 });
   }
 
-  const now = new Date();
-  const currentDay = DAY_MAP[now.getDay()];
-  const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  const { day: currentDay, time: currentTime } = getBrusselsNow();
 
   const schedules = await prisma.schedule.findMany({
     where: {

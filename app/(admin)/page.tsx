@@ -1,9 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { getBrusselsNow } from "@/lib/timezone";
 import Link from "next/link";
-
-const DAY_MAP: Record<number, string> = {
-  0: "sun", 1: "mon", 2: "tue", 3: "wed", 4: "thu", 5: "fri", 6: "sat",
-};
 
 async function getScreensWithCurrent() {
   const screens = await prisma.screen.findMany({
@@ -17,9 +14,7 @@ async function getScreensWithCurrent() {
     orderBy: { id: "asc" },
   });
 
-  const now = new Date();
-  const currentDay = DAY_MAP[now.getDay()];
-  const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  const { day: currentDay, time: currentTime } = getBrusselsNow();
 
   return screens.map((screen) => {
     const activeSchedule = screen.schedules.find((s) => {

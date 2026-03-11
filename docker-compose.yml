@@ -9,6 +9,7 @@ services:
     environment:
       - DATABASE_URL=file:./data/signage.db
       - UPLOADS_DIR=/app/uploads
+      - TZ=Europe/Brussels
     restart: unless-stopped
 
 volumes:

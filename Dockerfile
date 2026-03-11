@@ -15,6 +15,7 @@ RUN npx prisma generate
 RUN npm run build
 
 FROM base AS runner
+RUN apk add --no-cache tzdata
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -42,6 +43,7 @@ ENV PORT=3008
 ENV HOSTNAME="0.0.0.0"
 ENV DATABASE_URL="file:./data/signage.db"
 ENV UPLOADS_DIR="/app/uploads"
+ENV TZ="Europe/Brussels"
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["node", "server.js"]
