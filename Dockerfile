@@ -44,6 +44,7 @@ ENV HOSTNAME="0.0.0.0"
 ENV DATABASE_URL="file:./data/signage.db"
 ENV UPLOADS_DIR="/app/uploads"
 ENV TZ="Europe/Brussels"
+ENV AUTH_SECRET="placeholder-set-via-docker-compose"
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["node", "server.js"]

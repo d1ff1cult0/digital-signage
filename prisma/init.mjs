@@ -54,6 +54,19 @@ async function main() {
     )
   `);
 
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "Admin" (
+      "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      "username" TEXT NOT NULL,
+      "passwordHash" TEXT NOT NULL,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    CREATE UNIQUE INDEX IF NOT EXISTS "Admin_username_key" ON "Admin"("username")
+  `);
+
   console.log("Tables created.");
 
   console.log("Seeding screens...");

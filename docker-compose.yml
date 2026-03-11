@@ -10,6 +10,7 @@ services:
       - DATABASE_URL=file:./data/signage.db
       - UPLOADS_DIR=/app/uploads
       - TZ=Europe/Brussels
+      - AUTH_SECRET=replace-with-a-long-random-string
     restart: unless-stopped
 
 volumes:

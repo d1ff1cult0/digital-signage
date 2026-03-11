@@ -1,0 +1,61 @@
+name: Deploy Digital Signage
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lowercase repo name for Docker
+        run: |
+          echo "REPO_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Create source tarball
+        run: |
+          mkdir -p ../deploy-src
+          rsync -a --exclude='node_modules' --exclude='.next' --exclude='.git' \
+                --exclude='.env*' --exclude='.DS_Store' --exclude='uploads' \
+                --exclude='prisma/data' \
+                . ../deploy-src/
+          tar -czf source.tar.gz -C ../deploy-src .
+
+      - name: Copy source to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "source.tar.gz"
+          target: "~/"
+
+      - name: Build and deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            DEPLOY_DIR=/vtk/data/digital-signage
+
+            mkdir -p $DEPLOY_DIR
+
+            mv ~/source.tar.gz $DEPLOY_DIR/ || { echo "Error: could not move source.tar.gz. Make sure $DEPLOY_DIR exists and is writable."; exit 1; }
+
+            cd $DEPLOY_DIR
+
+            tar -xzf source.tar.gz
+            rm -f source.tar.gz
+
+            docker build -t ghcr.io/${{ env.REPO_NAME }}:latest .
+
+            docker compose up -d
+
+            docker image prune -f

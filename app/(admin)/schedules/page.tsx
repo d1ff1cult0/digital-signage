@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import TimePicker from "../../components/TimePicker";
 
 interface Screen {
   id: number;
@@ -209,32 +210,22 @@ export default function SchedulesPage() {
 
                     {isAdding ? (
                       <div className="flex items-end gap-3 px-5 py-3 bg-muted-bg/40 border-t border-card-border">
-                        <div className="w-28 shrink-0">
-                          <label className="block text-[11px] font-medium text-muted mb-1">
-                            From
-                          </label>
-                          <input
-                            type="time"
+                        <div className="shrink-0">
+                          <TimePicker
+                            label="From"
                             value={form.startTime}
-                            onChange={(e) =>
-                              setForm({ ...form, startTime: e.target.value })
+                            onChange={(v) =>
+                              setForm({ ...form, startTime: v })
                             }
-                            className="!py-1.5 !text-sm font-mono"
-                            required
                           />
                         </div>
-                        <div className="w-28 shrink-0">
-                          <label className="block text-[11px] font-medium text-muted mb-1">
-                            Until
-                          </label>
-                          <input
-                            type="time"
+                        <div className="shrink-0">
+                          <TimePicker
+                            label="Until"
                             value={form.endTime}
-                            onChange={(e) =>
-                              setForm({ ...form, endTime: e.target.value })
+                            onChange={(v) =>
+                              setForm({ ...form, endTime: v })
                             }
-                            className="!py-1.5 !text-sm font-mono"
-                            required
                           />
                         </div>
                         <div className="flex-1 min-w-0">
