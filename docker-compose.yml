@@ -1,0 +1,16 @@
+services:
+  signage:
+    build: .
+    ports:
+      - "3008:3008"
+    volumes:
+      - db-data:/app/prisma/data
+      - uploads:/app/uploads
+    environment:
+      - DATABASE_URL=file:./data/signage.db
+      - UPLOADS_DIR=/app/uploads
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  uploads:
