@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
 import { ensureUploadsDir, generateFilename, getUploadsDir } from "@/lib/uploads";
 import fs from "fs/promises";
@@ -5,6 +6,9 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 
 export async function GET() {
+  const denied = await requireAuth();
+  if (denied) return denied;
+
   const media = await prisma.media.findMany({
     orderBy: { createdAt: "desc" },
     include: {
@@ -15,6 +19,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = await requireAuth();
+  if (denied) return denied;
+
   try {
     await ensureUploadsDir();
     const formData = await req.formData();

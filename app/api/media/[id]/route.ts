@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
 import { getUploadsDir } from "@/lib/uploads";
 import fs from "fs/promises";
@@ -8,6 +9,9 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireAuth();
+  if (denied) return denied;
+
   const { id } = await params;
   const mediaId = parseInt(id, 10);
   if (isNaN(mediaId)) {

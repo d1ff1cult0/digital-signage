@@ -1,7 +1,11 @@
+import { requireAuth } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
+  const denied = await requireAuth();
+  if (denied) return denied;
+
   const screens = await prisma.screen.findMany({
     include: {
       schedules: {
@@ -15,6 +19,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = await requireAuth();
+  if (denied) return denied;
+
   try {
     const body = await req.json();
     const { name, description } = body;

@@ -16,6 +16,19 @@ async function main() {
   console.log("Initializing database...");
 
   await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "Admin" (
+      "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      "username" TEXT NOT NULL,
+      "passwordHash" TEXT NOT NULL,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    CREATE UNIQUE INDEX IF NOT EXISTS "Admin_username_key" ON "Admin"("username")
+  `);
+
+  await prisma.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "Screen" (
       "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
       "name" TEXT NOT NULL,
@@ -54,31 +67,18 @@ async function main() {
     )
   `);
 
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "Admin" (
-      "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-      "username" TEXT NOT NULL,
-      "passwordHash" TEXT NOT NULL,
-      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+  console.log("Tables ready.");
 
-  await prisma.$executeRawUnsafe(`
-    CREATE UNIQUE INDEX IF NOT EXISTS "Admin_username_key" ON "Admin"("username")
-  `);
-
-  console.log("Tables created.");
-
-  console.log("Seeding screens...");
-  for (const screen of SCREENS) {
-    const existing = await prisma.screen.findFirst({ where: { name: screen.name } });
-    if (!existing) {
+  const screenCount = await prisma.screen.count();
+  if (screenCount === 0) {
+    console.log("First run — seeding default screens...");
+    for (const screen of SCREENS) {
       await prisma.screen.create({ data: screen });
     }
+    console.log(`Seeded ${SCREENS.length} screens.`);
+  } else {
+    console.log(`Database already has ${screenCount} screens, skipping seed.`);
   }
-
-  const count = await prisma.screen.count();
-  console.log(`Database ready. ${count} screens available.`);
 }
 
 main()

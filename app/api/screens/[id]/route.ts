@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -5,6 +6,9 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireAuth();
+  if (denied) return denied;
+
   const { id } = await params;
   const screenId = parseInt(id, 10);
   if (isNaN(screenId)) {
@@ -31,6 +35,9 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await requireAuth();
+  if (denied) return denied;
+
   const { id } = await params;
   const screenId = parseInt(id, 10);
   if (isNaN(screenId)) {
